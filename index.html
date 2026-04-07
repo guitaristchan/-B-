@@ -12,21 +12,20 @@
         .swiper { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
         .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 입력창 영역 - 버튼을 없애고 입력창만 길게 배치 */
+        /* 입력창 영역 - 버튼을 아예 삭제하고 입력창만 띄움 */
         #chat-box {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             z-index: 999999999 !important; 
-            display: flex; 
-            background: rgba(255, 255, 255, 0.95); padding: 12px;
-            border-radius: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            background: rgba(255, 255, 255, 0.95); padding: 12px 20px;
+            border-radius: 30px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
             width: 80%; max-width: 400px; 
             pointer-events: auto !important;
+            display: flex; justify-content: center;
         }
         
         #chat-box input { 
-            flex: 1; border: none; padding: 10px 15px; border-radius: 20px; 
-            outline: none; font-size: 16px; background: transparent;
-            text-align: center; /* 입력창 중앙 정렬로 더 깔끔하게 */
+            width: 100%; border: none; outline: none; font-size: 16px; 
+            background: transparent; text-align: center;
         }
 
         /* 버튜버 위젯 클릭 관통 설정 */
@@ -46,7 +45,7 @@
     </div>
 
     <div id="chat-box">
-        <input type="text" id="userInput" placeholder="질문 후 엔터를 누르세요!" autocomplete="off" />
+        <input type="text" id="userInput" placeholder="궁금한 점 입력 후 엔터를 누르세요!" autocomplete="off" />
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -69,7 +68,7 @@
             on: { slideChangeTransitionEnd: function() { L2Dwidget.showTextMessage(descriptions[this.realIndex], 3000); } }
         });
 
-        // 엔터키 입력 로직
+        // 엔터키 입력 로직 (버튼 클릭 함수 없이 엔터만 감지)
         const input = document.getElementById('userInput');
 
         input.addEventListener('keypress', function(e) {
@@ -79,17 +78,17 @@
 
                 let reply = `'${query}'에 대해 궁금하시군요!`;
                 
+                // 키워드 대답 설정
                 if(query.includes("대학") || query.includes("학교")) {
-                    reply = "휘찬님은 **서울대학교 음악대학**에 재학 중입니다! 🎓";
+                    reply = "윤휘찬님은 **서울대학교 음악대학**에 재학 중입니다! 🎓";
                 } else if(query.includes("전공") || query.includes("악기")) {
                     reply = "현재 **현악**을 전공하고 있어요! 🎻";
                 } else if(query.includes("학생회")) {
-                    reply = "음대 학생회 **사무부국장**으로 활동했습니다! 💼";
+                    reply = "음대 학생회 **사무부국장**으로 활동하며 행정을 혁신했습니다! 💼";
                 }
 
                 L2Dwidget.showTextMessage(reply, 5000);
-                input.value = ""; // 입력 후 창 비우기
-                input.blur(); // 모바일 키보드 내리기
+                input.value = ""; // 입력창 비우기
             }
         });
     </script>
