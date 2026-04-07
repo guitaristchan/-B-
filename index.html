@@ -4,33 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>휘찬의 AI 포트폴리오</title>
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         body { margin: 0; padding: 0; background-color: transparent; overflow: hidden; font-family: sans-serif; }
-        
-        /* 슬라이더 영역 */
         .swiper { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
         .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 하단 질문 입력창 - z-index를 가장 높게 설정 */
+        /* 입력창 영역 - 최상단으로 올림 */
         #chat-box {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 999999 !important; /* 버튜버보다 무조건 앞에 오게 함 */
+            z-index: 999999 !important; 
             display: flex; gap: 10px;
-            background: rgba(255, 255, 255, 0.9); padding: 12px;
-            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.95); padding: 12px;
+            border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
             width: 85%; max-width: 450px; 
-            backdrop-filter: blur(5px);
-            pointer-events: auto !important; /* 클릭 차단 방지 */
+            pointer-events: auto !important;
         }
-        #chat-box input {
-            flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 6px; outline: none; font-size: 16px;
-        }
-        #chat-box button {
-            background: #007aff; color: white; border: none; padding: 10px 20px;
-            border-radius: 6px; cursor: pointer; font-weight: bold;
-        }
+        #chat-box input { flex: 1; border: 1px solid #ccc; padding: 12px; border-radius: 6px; outline: none; font-size: 16px; }
+        #chat-box button { background: #007aff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        /* 버튜버 클릭 방지 */
+        #live2d-widget { pointer-events: none !important; }
+    </style>
+</head>
+<body>
 
-        /* 버튜버 위젯 설정 */
-        #live2d-
+    <div class="swiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="https://via.placeholder.com/800x1200?text=사진1:+서울대+공연"></div>
+            <div class="swiper-slide"><img src="https://via.placeholder.com/800x1200?text=사진2:+학생회+활동"></div>
+            <div class="swiper-slide"><img src="https://via.placeholder.com/800x1200?text=사진3:+IT+프로젝트"></div>
+        </div>
+        <div class="swiper-button-next" style="color:white;"></div>
+        <div class="swiper-button-prev" style="color:white;"></div>
+    </div>
+
+    <div id="chat-box">
+        <input type="text" id="userInput" placeholder="대학교 어디야? (입력 후 클릭)" />
+        <button type="button" id="sendBtn">질문</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/live2d-widget@3.1.4/lib/L2Dwidget.min.js"></script>
+
+    <script>
+        // 1. 버튜버 초기화
+        L2Dwidget.init({
+            "model": { "jsonPath": "https://cdn.jsdelivr.net/gh/evrstr/live2d-widget-models/live2d_evrstr/koharu/model.json" },
+            "display": { "position": "right", "width": 150, "height": 300, "hOffset": 10, "vOffset": 0 },
+            "mobile": { "show": true },
+            "dialog": { "enable": true, "script": { 'every idle 10s': '$hitokoto$', 'tap face': '안녕!', 'tap body': '휘찬님 화이팅!' } }
+        });
+
+        // 2. 슬라이더 설정
+        const infoTexts = ["🎻 서울대 음대 공연 모습!", "💼 학생회 활동 경험!", "💻 IT 융합 프로젝트!"];
+        const swiper = new Swiper('.swiper', {
+            loop: true,
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            on: { slideChangeTransitionEnd: function() { L2Dwidget.showTextMessage(infoTexts[this.realIndex], 3000); } }
+        });
+
+        // 3. 질문 기능 (가장 확실한 클릭 이벤트 등록 방식)
