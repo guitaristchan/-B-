@@ -3,54 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이채원B 알아도 제대로 알자 !</title>
+    <title>이채원B 알아도 제대로 알자!</title>
     <style>
+        /* 배경 및 기본 폰트 */
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background-color: #ffffff; 
+            background-color: #ffffff; 
             font-family: 'Pretendard', sans-serif; 
+            overflow: hidden;
         }
         
+        /* 1. 거대 타이틀 중앙 배치 */
         #main-title {
-            position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
-            font-size: 50px; font-weight: 900; color: #000; z-index: 100; 
-            text-align: center; width: 100%; letter-spacing: -2px;
+            position: fixed;
+            top: 40%; /* 화면 중앙 근처 */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 64px; /* 훨씬 크게 */
+            font-weight: 900;
+            color: #000;
+            text-align: center;
+            width: 90%;
+            letter-spacing: -3px;
+            z-index: 10;
+            pointer-events: none; /* 클릭 방해 금지 */
         }
 
+        /* 2. 하단 입력창 */
         #chat-container {
             position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
-            z-index: 999999999; display: flex; width: 80%; max-width: 550px;
+            z-index: 9999; display: flex; width: 85%; max-width: 600px;
             background: #f1f1f1; padding: 15px 25px; border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
         
         #userInput { flex: 1; border: none; outline: none; font-size: 18px; padding: 5px 10px; background: transparent; color: #111; }
         #sendBtn { border: none; background: #000; color: white; padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold; }
 
-        .live2d-widget-dialog-container { position: fixed !important; right: 40px !important; bottom: 350px !important; z-index: 999999 !important; }
+        /* 3. 유동적인 말풍선 (텍스트 길이에 반응) */
+        .live2d-widget-dialog-container { 
+            position: fixed !important; right: 40px !important; bottom: 350px !important; 
+            z-index: 999999 !important; 
+        }
         .live2d-widget-dialog {
             background: #fff !important; border: 3px solid #000 !important; border-radius: 35px !important; 
-            padding: 25px 30px !important; font-size: 17px !important; font-weight: 600 !important;
+            padding: 25px 30px !important; font-size: 18px !important; font-weight: 600 !important;
             color: #111 !important; line-height: 1.6 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-            width: fit-content !important; min-width: 200px !important; max-width: 400px !important;
+            /* 핵심: 자동 너비 조절 */
+            width: auto !important; min-width: 180px !important; max-width: 450px !important;
+            height: auto !important; text-align: center !important; opacity: 0; transition: opacity 0.3s;
         }
     </style>
 </head>
 <body>
 
-    <h1 id="main-title">이채원B 알아도 제대로 알자 !</h1>
+    <h1 id="main-title">이채원B 알아도 제대로 알자!</h1>
 
     <div id="chat-container">
-        <input type="text" id="userInput" placeholder="궁금한 키워드를 입력하세요 (예: 강령, 취향, 가사, 전공)" autocomplete="off" />
-        <button id="sendBtn">질문</button>
+        <input type="text" id="userInput" placeholder="어이 자네 이채원님을 존경해라!" autocomplete="off" />
+        <button id="sendBtn">확인</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/live2d-widget@3.1.4/lib/L2Dwidget.min.js"></script>
 
     <script>
+        // 버튜버 초기화
         L2Dwidget.init({
             "model": { "jsonPath": "https://cdn.jsdelivr.net/gh/evrstr/live2d-widget-models/live2d_evrstr/koharu/model.json" },
-            "display": { "position": "right", "width": 250, "height": 500, "hOffset": 30, "vOffset": 0 },
+            "display": { "position": "right", "width": 280, "height": 550, "hOffset": 30, "vOffset": -20 },
             "dialog": { "enable": true }
         });
 
@@ -64,52 +84,53 @@
             }
         }
 
-        // 텍스트 파일 데이터 완전 추출 DB
-        const chaewonDB = {
-            "MBTI": "INTP입니다. '이거 말고는 아무것도 안 나오니까 제발 그렇다면 그런 줄 알아'라고 강조하시네요[cite: 68].",
-            "전공": "바이올린을 전공하고 있습니다. '안 좋아하는데 나를 갈아서 전공할 이유가 없다'고 할 만큼 애정이 깊어요[cite: 32, 62, 108].",
-            "별명": "씨노브, 채노브, 노브, 노브라, 이채노브스키 등이 있고, 스스로를 '정병걸린 은둔자'라고 부르기도 합니다[cite: 83, 148].",
-            "이름": "채one이라서 숫자 1을 좋아하며, 동명이인에 대한 PTSD가 있어 세상에 없던 이름으로 개명하고 싶어 합니다[cite: 30, 70].",
-            "음식": "회, 산낙지, 내장 요리, 양고기, 삼겹살, 빵, 떡, 치즈 등 안 좋아하는 걸 적는 게 빠를 정도로 다 잘 먹습니다.",
-            "고수": "유일하게 못 먹는 음식은 '고수'입니다[cite: 101, 147].",
-            "공차": "블랙밀크티에 펄 추가, 당도 30, 얼음 적게 해서 드시는 게 정석입니다.",
-            "커피": "아인슈페너류를 좋아하며, 프리퍼의 '멜라 크레마' 크림 맛을 예술이라고 평가하셨어요[cite: 12].",
-            "음악": "클래식 전공이지만 얼터너티브 락, 재즈, 인디, 로파이 등 잡식성입니다. 도입부의 '냄새'가 중요하다고 해요[cite: 8, 32].",
-            "실리카겔": "'Power Andre 99' 앨범은 100번 넘게 정주행했고, 오늘 고마웠던 존재로 'Kyo181'을 꼽았습니다.",
-            "가수": "황소윤, 김한주, 이승윤을 좋아합니다.",
-            "배우": "베네딕트 컴버배치, 남주혁, 조정석을 좋아합니다.",
-            "가사": "평소 멜로디와 사운드를 먼저 듣지만, 노랫말이라는 지극히 일상적인 문학 장르도 참 좋아합니다[cite: 8, 57].",
-            "책": "데미안, 황야의 이리, 달과 6펜스, 코스모스, 도시와 그 불확실한 벽 등을 좋아합니다[cite: 28].",
-            "영화": "콜 미 바이 유어 네임, 본 투 비 블루, 릴리 슈슈의 모든 것, 마이 블루베리 나이츠 등을 좋아합니다.",
-            "드라마": "드라마 '스물다섯 스물하나'를 좋아합니다[cite: 42].",
-            "브랜드": "추구미는 niceghostclub이고, 접근성이 좋아 Zara 옷을 가장 많이 입습니다[cite: 45].",
-            "취향": "베리, 로즈, 우디향을 좋아하고 색깔은 블랙핑크, 게임은 피크민을 즐깁니다[cite: 29, 32, 40].",
-            "성격": "예민보스지만 겉과 속이 같고 허세 없는 높은 자존감을 가진 성격을 좋아합니다[cite: 30, 53].",
-            "좌우명": "'인생은 기세다'가 좌우명이고, '뻔당기(뻔뻔, 당당, 기막히게)'라는 글귀를 좋아합니다[cite: 36, 64].",
-            "목표": "건강하게 살다가 투병 없이 너무 아프지 않게 죽는 것이 최종 목표입니다[cite: 66].",
-            "환생": "부잣집 반려묘로 태어나고 싶어 하십니다[cite: 49].",
-            "결혼": "사랑과 우정 중 사랑을 택하며, '결혼 잘 하기'가 소원이자 중요한 목표입니다[cite: 56, 87, 119].",
-            "강령": "기상 후 음악 틀기, 어깨 펴기, 대중교통에서 집중하기 등 15가지 '상황별 행동 강령'을 지키며 삶의 난이도를 낮춥니다 .",
-            "행동강령": "15가지 준칙이 있습니다. 예컨대 '격하게 아무것도 하기 싫을 땐 미련 없이 내려놓기' 같은 것들이죠[cite: 193].",
-            "일기": "방황과 고독, 감정과 이성에 대해 깊이 고민하며 '내가 믿는 것이 진실'이라고 생각하기로 했습니다[cite: 6, 154].",
-            "고독": "고독의 끝을 탐구하며, 자신의 이야기를 나만이 간직하는 편이 낫겠다고 생각하기도 합니다.",
-            "더위": "더위에 굴복해 늘어지기도 하지만, 냉장고의 수박만 있다면 강해질 수 있습니다.",
-            "창업": "음악에 맞춰 악보를 저절로 넘겨주는 AI 악보 인식기를 아이템으로 생각한 적이 있습니다[cite: 168].",
-            "후회": "지나간 일을 곱씹는 것은 쓸데없다고 느껴 최대한 후회하지 않으려 노력합니다[cite: 100].",
-            "사랑": "사랑에는 최선을 다해야 한다고 믿으며, 평생 사랑할 수 있는 한 사람을 찾는 중입니다[cite: 76, 122].",
-            "비밀": "남들은 나에 대해 잘 모를 것이라고 생각하며, 나를 많이 감추는 편입니다[cite: 89, 104]."
-        };
+        // 보고서 TXT 완전 추출 데이터베이스
+        const chaewonDB = [
+            { keys: ["mbti", "엠비티아이"], value: "확신의 INTP입니다. 이거 말고는 아무것도 안 나오니까 제발 그렇다면 그런 줄 알라고 하시네요!" },
+            { keys: ["전공", "바이올린", "악기"], value: "바이올린을 전공하고 있어요. 안 좋아하는데 자신을 갈아서 전공할 이유가 없다며 클래식에 진심인 편이죠. 하지만 베이스를 배워 밴드를 하는 꿈도 있답니다." },
+            { keys: ["이름", "개명", "성함"], value: "채one이라서 숫자 1을 좋아해요. 동명이인 PTSD가 있어서 개명한다면 세상에 존재하지 않았던 이름을 찾아낼 거래요." },
+            { keys: ["별명", "닉네임"], value: "씨노브, 채노브, 노브, 노브라, 이채노브스키 등 아주 다양해요." },
+            { keys: ["음식", "먹는거", "맛집"], value: "회, 산낙지, 각종 내장 요리, 양고기, 삼겹살, 빵, 떡, 치즈 등 다 좋아해요. 특히 삼겹살 비계와 닭보다 먼저인 달걀을 좋아하죠." },
+            { keys: ["고수", "편식"], value: "유일하게 고수만 못 먹어요! 쌀국수 먹을 때 주의해야겠죠?" },
+            { keys: ["공차", "밀크티"], value: "블랙밀크티에 펄 추가, 당도 30, 얼음 적게! 이게 채원님의 고정 레시피예요." },
+            { keys: ["커피", "카페"], value: "아메리카노와 라떼를 즐겨요. 프리퍼의 '멜라 크레마' 크림 맛이 예술이라고 극찬하셨죠." },
+            { keys: ["수박", "강함"], value: "냉장고에 예쁘게 잘린 수박만 있다면 채원님은 무서울 게 없는 강한 사람입니다." },
+            { keys: ["음악", "노래", "실리카겔", "혁오"], value: "도입부의 '냄새'가 중요해요. 실리카겔의 앨범은 100번 이상 정주행했고, 혁오의 수록곡 '부숴줘' 시리즈도 좋아해요." },
+            { keys: ["가수", "아티스트"], value: "황소윤, 김한주, 이승윤을 좋아합니다." },
+            { keys: ["책", "작가", "도서"], value: "데미안, 황야의 이리, 달과 6펜스, 코스모스 등을 좋아하며 작가로는 헤르만 헤세, 이석원을 꼽았어요." },
+            { keys: ["영화", "배우"], value: "'콜 미 바이 유어 네임', '본 투 비 블루' 등을 좋아하고 배우로는 조정석, 남주혁, 컴버배치를 좋아해요." },
+            { keys: ["좌우명", "기세"], value: "인생은 기세다! 그리고 '뻔당기(뻔뻔, 당당, 기막히게)'라는 글귀를 가슴에 새기고 살아요." },
+            { keys: ["강령", "습관", "준칙"], value: "삶의 난이도를 낮추기 위한 15가지 강령이 있어요. 기상 후 음악 틀기, 어깨 펴고 걷기, 30분 홈트 등이죠." },
+            { keys: ["목표", "꿈", "소망"], value: "너무 아프지 않게 건강하게 살다 죽는 것, 그리고 좋은 사람과 결혼 잘 하는 것이 최종 목표예요." },
+            { keys: ["고독", "은둔자", "정병"], value: "자신을 '정병걸린 은둔자'라고 일곱 글자로 표현하기도 했어요. 고독의 심연을 탐구하는 걸 즐기는 편이죠." },
+            { keys: ["환생", "고양이"], value: "다시 태어난다면 부잣집 반려묘로 태어나고 싶어 해요. 사람으로 태어나긴 싫대요!" },
+            { keys: ["사랑", "연애"], value: "사랑에는 최선을 다해야 한다고 믿어요. 우정보다 사랑을 택할 만큼 사랑에 진심이며 평생 사랑할 한 사람을 찾고 있어요." },
+            { keys: ["창업", "아이패드"], value: "음악에 맞춰 악보를 자동으로 넘겨주는 장치를 아이템으로 생각한 적이 있어요. 음대생들의 필수템이겠죠?" },
+            { keys: ["후회", "과거"], value: "지나간 일을 곱씹는 건 쓸데없다고 생각해서 최대한 후회하지 않으려 노력하는 편이에요." },
+            { keys: ["성격", "예민"], value: "스스로를 '예민보스'라고 하지만, 겉과 속이 다르지 않고 허세 없는 높은 자존감을 가진 사람을 좋아해요." },
+            { keys: ["번호", "연락처", "전화"], value: "번호는 비밀이에요! 하지만 채원님은 010-xxxx-xxxx 라고 물어보면 대답해줄지도 몰라요. (직접 물어보세요!)" },
+            { keys: ["피크민", "게임"], value: "요즘은 피크민 75마리와 함께 행복을 찾고 있어요. 초딩 땐 바운스볼 팡인이었죠." },
+            { keys: ["취미", "특기"], value: "취미는 누워있기이고, 특기는 팔이 길어서 남들보다 훨씬 잘 찍는 광각샷입니다." },
+            { keys: ["향", "냄새"], value: "베리향, 로즈향, 우디향을 좋아하지만 비슷한 계열이라도 직접 맡아봐야 확신하는 편이에요." },
+            { keys: ["요일", "월요일"], value: "특이하게 월요일을 좋아해요. 새 월요일을 맞이할 준비를 하는 시간을 소중히 여기죠." },
+            { keys: ["브랜드", "옷"], value: "추구하는 스타일은 niceghostclub이지만, 접근성 좋은 Zara 옷을 제일 많이 입어요." },
+            { keys: ["비속어", "욕"], value: "인생이 팍팍해지면 빈도가 늘어나지만 실제로는 많이 안 쓰려고 노력한답니다." },
+            { keys: ["거절", "태도"], value: "어릴 땐 못 했지만 크면서 거절하는 법을 배웠대요. 이미지 관리는 이미 포기한 지 오래고요!" },
+            { keys: ["진실", "믿음"], value: "진실 따윈 없다고 생각하기로 했어요. 그냥 내가 보고 느끼는 것, 내가 믿는 것이 진실이라고 생각하며 살아요." }
+        ];
 
+        // 키워드 정밀 매칭 함수
         function handleQuestion() {
             const input = document.getElementById('userInput');
-            const msg = input.value.trim();
+            const msg = input.value.trim().toLowerCase();
             if (!msg) return;
 
-            let reply = "보고서의 222개 답변과 일기 데이터 내에서 해당 내용을 찾지 못했어요. '성격', '취향', '가사', '강령' 등을 입력해 보세요!";
+            let reply = "죄송합니다, 이채원님에게 물어보겠습니다! '전공', '강령', '성격' 등을 물어봐 주세요.";
 
-            for (let key in chaewonDB) {
-                if (msg.includes(key)) {
-                    reply = chaewonDB[key];
+            for (let i = 0; i < chaewonDB.length; i++) {
+                const item = chaewonDB[i];
+                if (item.keys.some(key => msg.includes(key))) {
+                    reply = item.value;
                     break;
                 }
             }
